@@ -1,1 +1,0 @@
-YUI.add("testmodule",function(A){testmodule=function(){};testmodule.prototype={someFunc:function(){return true;}};A.testmodule=testmodule;},"@VERSION@");
