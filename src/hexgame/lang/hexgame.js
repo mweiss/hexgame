@@ -1,0 +1,3 @@
+{
+  hexgameTitle: "hexgame"
+}

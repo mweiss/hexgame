@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>hexgame tests</title>
+<script type="text/javascript" src="http://yui.yahooapis.com/3.3.0/build/yui/yui-debug.js"></script>
+<script type="text/javascript" src="../../build/hexgame-loader/hexgame-loader.js"></script>
+</head>
+<body class="yui3-skin-sam">
+<div id="hexgame" />
+<script type="text/javascript">
+console.log('test');
+YUI().use('hexgame', function(Y) {
+  var model = new Y.HexGameModel({
+    players : [
+      {type : 'localuser'},
+      {type : 'localuser'},
+      {type : 'localuser'},
+      {type : 'localuser'},
+      {type : 'localuser'},
+      {type : 'localuser'}
+    ]
+  });
+  players = model.get('players');
+  console.log(model.get('players'));
+  console.log(model.get('board').get('cells'));
+  
+  var hg = new Y.HexGame({
+    model : model,
+    scale : 15,
+    contentBox : "hexgame"
+  });
+  hg.render();
+});
+</script>
+</body>
+</html>
