@@ -38,7 +38,7 @@ var HexGameModel = Y.Base.create("hexgame", Y.Base, [], {
      // Determine which colors have already been assigned.
      Y.each(players, function(player) {
        if (Lang.isNumber(player.color)) {
-         colorsUsed["c" + player.color] = true;
+         colorsUsed[player.color] = true;
        }
        if (Lang.isString(player.id)) {
          idsUsed[player.id] = true;
@@ -50,7 +50,8 @@ var HexGameModel = Y.Base.create("hexgame", Y.Base, [], {
        var color;
        do {
          color = HexGameModel.VALID_COLORS[Math.floor(HexGameModel.VALID_COLORS.length * Math.random())];
-       } while (colorsUsed["c" + color]);
+       } while (colorsUsed[color]);
+       colorsUsed[color] = true;
        return color;
      };
      
@@ -60,6 +61,7 @@ var HexGameModel = Y.Base.create("hexgame", Y.Base, [], {
        do {
          id = Y.guid();
        } while (idsUsed[id]);
+       idsUsed[id] = true;
        return id;
      };
      
@@ -96,7 +98,7 @@ var HexGameModel = Y.Base.create("hexgame", Y.Base, [], {
      return true;
    }
 },{
-  VALID_COLORS : [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff],
+  VALID_COLORS : ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'],
   
   ATTRS: {
     /**

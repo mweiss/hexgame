@@ -17,9 +17,61 @@ var REGULAR_HEX_PATH = [
   0.25, Math.sin(Math.PI / 3) + HEX_BUFFER
 ];
 
+var HEX_X_INCREMENT = 1.5;
+var HALF_HEX_X_INCREMENT = HEX_X_INCREMENT / 2;
+var HEX_Y_INCREMENT = -0.5 * Math.sin(Math.PI / 3);
+
 var HexDrawUtils = function() {};
   
 HexDrawUtils.prototype = {
+  
+  /**
+   * Helper method which converts the hex grid coordinates to coordinates in the lower right 
+   * quadrant of a cartesian grid.
+   */
+  convertHexGridCoordinatesToCartesian : function(aHexCoord) {
+    var x = aHexCoord[0], y = aHexCoord[1], cartesianX, cartesianY;
+    
+    cartesianX = (y % 2 === 0) ? HEX_X_INCREMENT * x : HALF_HEX_X_INCREMENT + (HEX_X_INCREMENT * x);
+    cartesianY = HEX_Y_INCREMENT * y;
+    
+    return [cartesianX, cartesianY];
+  },
+  
+  /**
+   * Helper method which converts coordinates in the lower right quadrant of a cartesian grid
+   * to hex grid coordiantes.
+   */
+  convertCartesianCoordiantesToHexGrid : function(aCartesianCoord) {
+    var x = aCartesianCoord[0], y = aCartesianCoord[1], hexX, hexY;
+    
+    hexY = Math.round(y / HEX_Y_INCREMENT);
+    hexX = Math.round((hexY % 2 === 0) ? x / HEX_X_INCREMENT : (x - HALF_HEX_X_INCREMENT) / HEX_X_INCREMENT);
+    return [hexX, hexY];
+  },
+
+  /**
+   * Returns the x, y, width, and height dimensions.
+   */
+  getDimensions : function(cells) {
+    var minX, minY, maxX, maxY;
+    Y.Array.each(cells, function(cell) {
+      var cartesianCoords = this.convertHexGridCoordinatesToCartesian(cell),
+          x = cartesianCoords[0],
+          y = cartesianCoords[1];
+      minX = minX === undefined ? x - 0.5 : Math.min(minX, x - 0.5);
+      minY = minY === undefined ? y + HEX_Y_INCREMENT : Math.min(minY, y + HEX_Y_INCREMENT);
+      maxX = maxX === undefined ? x + 0.5 : Math.max(maxX, x + 0.5);
+      maxY = maxY === undefined ? y - HEX_Y_INCREMENT : Math.max(maxY, y - HEX_Y_INCREMENT);
+    }, this);
+    return {
+      x : minX,
+      y : maxY,
+      width : maxX - minX,
+      height : maxY - minY
+    };
+  },
+  
   /**
    * Helper method which draws a closed shape onto oBoard, where
    * shape is represented by an array of points aPath.  Returns the

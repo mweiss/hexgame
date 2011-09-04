@@ -90,8 +90,8 @@ var HexGame = Y.Base.create("hexgame", Y.Widget, [/*Y.WidgetParent*/], {
   _renderHexPiecesUI : function() {
     // For now, render the pieces just for the top player
     var boardDimensions = this._getBoardRect(),
-        xOff = this.get('boardOffsetX'),
         yOff = this.get('boardOffsetY'),
+        xOff = this.get('boardOffsetX'),
         canvas = this.get('canvas'),
         scale = this.get('scale') / 2,
         middleX = xOff + boardDimensions.width / 2,
@@ -104,33 +104,99 @@ var HexGame = Y.Base.create("hexgame", Y.Widget, [/*Y.WidgetParent*/], {
       var topX = middleX - (NUM_PIECES_IN_ROW / 2) * pieceWidth;
       var topY = middleY - (pieces.length / NUM_PIECES_IN_ROW) * 0.5 * pieceHeight;
       var rotation = 60 * pIndex;
+      var color = player.get('color');
       Y.Array.each(pieces, function(piece, index) {
         var offsetX = topX + (index % NUM_PIECES_IN_ROW) * pieceWidth;
         var offsetY = topY + Math.floor(index / NUM_PIECES_IN_ROW) * pieceHeight;
-        var piece = new Y.HexGamePiece({
+        var hgPiece = new Y.HexGamePiece({
           piece : piece,
+          color : color,
           canvas : canvas,
           scale : scale,
           offsetX : offsetX,
           offsetY : offsetY
         });
-        piece.render();
-        piece.rotate(rotation, middleX, yOff + (boardDimensions.height / 2));
+        hgPiece.render();
+        hgPiece.rotate(rotation, middleX, yOff + (boardDimensions.height / 2));
       }, this);
     });
   },
   
+  /**
+   * TODO: should return the current non-computer controlled player.
+   */
+  _getCurrentPlayer : function() {
+    return this.get('model').get('players')[0];
+  },
+  
+  /**
+   * Renders the hex player stage area.
+   */
   _renderHexPlayerStageUI : function() {
-    var x = this.get('playerStageX'),
-        y = this.get('playerStageY'),
-        canvas = this.get('canvas');
-    
-    // Render the frame
-    var rect = canvas.rect(x, y, 300, 200);
-    
-    // Render each piece
-    
-    // Render the piece staging area
+    var topX = this.get('playerStageX'),
+        topY = this.get('playerStageY'),
+        canvas = this.get('canvas'),
+        currentPlayer = this._getCurrentPlayer(),
+        pieces = currentPlayer.get('pieces'),
+        scale = this.get('scale'),
+        pieceWidth = 3 * scale, pieceHeight = 4 * scale,
+        color = currentPlayer.get('color');
+        
+    // render each piece
+    Y.Array.each(pieces, function(piece, index) {
+      var offsetX = topX + (index % NUM_PIECES_IN_ROW) * pieceWidth;
+      var offsetY = topY + Math.floor(index / NUM_PIECES_IN_ROW) * pieceHeight;
+      var hgPiece = new Y.HexGamePiece({
+        piece : piece,
+        color : color,
+        canvas : canvas,
+        scale : scale,
+        offsetX : offsetX,
+        offsetY : offsetY
+      });
+      hgPiece.render();
+      hgPiece.on('click', function(ev) {
+        this._renderCurrentPiece(ev.target);
+      }, this);
+    }, this); 
+  },
+  
+  _renderCurrentPiece : function(oPiece) {
+    var selectedPiece = this.get('selectedPiece'),
+        rSelectedPiece;
+    var topX = this.get('playerStageX'),
+        topY = this.get('playerStageY'),
+        scale = this.get('scale'),
+        offsetX = topX + scale * (NUM_PIECES_IN_ROW + 2) * 3,
+        offsetY = topY + scale * 12,
+        canvas;
+    if (!selectedPiece || oPiece !== selectedPiece) {
+      rSelectedPiece = this.get('renderedSelectedPiece');
+      if (rSelectedPiece) {
+        rSelectedPiece.destroy();
+        if (this._renderedCircle) {
+          this._renderedCircle.remove();
+        }
+      }
+      canvas = oPiece.get('canvas');
+      rSelectedPiece = new Y.HexGamePiece({
+        piece : oPiece.get('piece'),
+        color : oPiece.get('color'),
+        canvas : oPiece.get('canvas'),
+        scale : scale * 2,
+        offsetX : offsetX,
+        offsetY : offsetY
+      });
+      rSelectedPiece.render();
+      var width = rSelectedPiece.get('width'),
+          height = rSelectedPiece.get('height');
+      var c = canvas.circle(offsetX + (width / 2), offsetY + (height / 2), 
+                            (Math.max(width, height) + rSelectedPiece.get('scale')) / 2);
+      c.attr({"stroke-width" : 5, "stroke" : "red"});
+      this._set('selectedPiece', selectedPiece);
+      this._set('renderedSelectedPiece', rSelectedPiece);
+      this._renderedCircle = c;
+    }  
   },
   
   bindUI : function() {
@@ -152,7 +218,7 @@ var HexGame = Y.Base.create("hexgame", Y.Widget, [/*Y.WidgetParent*/], {
       readOnly : true
     },
     width : {
-      value : 1200
+      value : 1400
     },
     height : {
       value : 1000
@@ -164,10 +230,16 @@ var HexGame = Y.Base.create("hexgame", Y.Widget, [/*Y.WidgetParent*/], {
       value : 200
     },
     playerStageX : {
-      value: 700
+      value: 720
     },
     playerStageY : {
-      value: 700
+      value: 300
+    },
+    selectedPiece : {
+      readOnly : true
+    },
+    renderedSelectedPiece : {
+      readOnly : true
     },
     model : {}
   }

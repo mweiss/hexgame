@@ -5,6 +5,7 @@ var HexGamePiece = Y.Base.create("hexgamepiece", Y.Base, [/*Y.WidgetParent*/], {
   },
 
   destructor : function() {
+    this.get('shapes').remove();
   },
 
   /**
@@ -14,18 +15,36 @@ var HexGamePiece = Y.Base.create("hexgamepiece", Y.Base, [/*Y.WidgetParent*/], {
   render : function() {
     var piece = this.get('piece');
     var shapes = [];
+    var canvas = this.get('canvas');
+    var group = canvas.set();
     Y.Array.each(piece.get('cells'), function(cell) {
       var shape = Y.HexDrawUtils.drawHex({
         x : cell[0],
         y : cell[1],
-        canvas : this.get('canvas'),
+        canvas : canvas,
         scale : this.get('scale'),
         offsetX : this.get('offsetX'),
         offsetY : this.get('offsetY')        
       });
-      shapes.push(shape);
+      group.push(shape);
     }, this);
-    this._set('shapes', shapes);
+    group.attr({fill: this.get('color')});
+    this._set('shapes', group);
+    this._addEventListeners();
+  },
+  
+  _addEventListeners : function() {
+    Y.Array.each(this.get('shapes'), function(shape) {
+      shape.$node.on('click', this._clickShapeListener, this);
+    }, this);
+  },
+  
+  /**
+   * Event listener when a shape is clicked.  This event listener triggers a new click event that's visible
+   * for the piece widget.
+   */
+  _clickShapeListener : function(ev) {
+    this.fire("click");
   },
   
   /**
@@ -36,7 +55,7 @@ var HexGamePiece = Y.Base.create("hexgamepiece", Y.Base, [/*Y.WidgetParent*/], {
       if (rotation !== 0) {
         shape.rotate(rotation, x, y);
       }
-    });
+    }, this);
   }
 },{
   //CSS_PREFIX: "hexgamepiece",
@@ -47,11 +66,28 @@ var HexGamePiece = Y.Base.create("hexgamepiece", Y.Base, [/*Y.WidgetParent*/], {
     canvas : {
       writeOnce : true
     },
+    height : {
+      readOnly : true,
+      getter : function(val, name) {
+        var dims = Y.HexDrawUtils.getDimensions(this.get('piece').get('cells'));
+        return dims.height * this.get('scale');
+      }
+    },
+    width : {
+      readOnly : true,
+      getter : function(val, name) {
+        var dims = Y.HexDrawUtils.getDimensions(this.get('piece').get('cells'));
+        return dims.width * this.get('scale');
+      }
+    },
     offsetX : {},
     offsetY : {},
     piece : {},
     shapes : {
       readOnly : true
+    },
+    color : {
+      value : '#ffffff'
     }
   }
 });
