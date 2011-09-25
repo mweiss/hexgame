@@ -25,6 +25,10 @@ var HexDrawUtils = function() {};
   
 HexDrawUtils.prototype = {
   
+  HEX_X_INCREMENT : HEX_X_INCREMENT,
+  HALF_HEX_X_INCREMENT : HALF_HEX_X_INCREMENT,
+  HEX_Y_INCREMENT : HEX_Y_INCREMENT,
+  
   /**
    * Helper method which converts the hex grid coordinates to coordinates in the lower right 
    * quadrant of a cartesian grid.

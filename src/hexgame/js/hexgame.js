@@ -190,13 +190,17 @@ var HexGame = Y.Base.create("hexgame", Y.Widget, [/*Y.WidgetParent*/], {
       rSelectedPiece.render();
       var width = rSelectedPiece.get('width'),
           height = rSelectedPiece.get('height');
-      var c = canvas.circle(offsetX + (width / 2), offsetY + (height / 2), 
-                            (Math.max(width, height) + rSelectedPiece.get('scale')) / 2);
+          
+      var cX = offsetX + (width / 2), 
+          cY = offsetY + (height / 2), 
+          radius = (Math.max(width, height) + rSelectedPiece.get('scale')) / 2;
+      var c = canvas.circle(cX, cY, radius);
+      c.toBack(); 
       c.attr({"stroke-width" : 5, "stroke" : "red"});
       this._set('selectedPiece', selectedPiece);
       this._set('renderedSelectedPiece', rSelectedPiece);
       this._renderedCircle = c;
-    }  
+    }
   },
   
   bindUI : function() {

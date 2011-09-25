@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <title>hexgame tests</title>
-<script type="text/javascript" src="http://yui.yahooapis.com/3.3.0/build/yui/yui-debug.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/3.4.0/build/yui/yui-debug.js"></script>
 <script type="text/javascript" src="../../build/hexgame-loader/hexgame-loader.js"></script>
 </head>
 <body class="yui3-skin-sam">
-<div id="hexgame" />
+<div id="hexgame"></div>
 <script type="text/javascript">
 console.log('test');
-YUI().use('hexgame', function(Y) {
+YUI({filter : 'raw'}).use('hexgame', function(Y) {
   var model = new Y.HexGameModel({
     players : [
       {type : 'localuser'},

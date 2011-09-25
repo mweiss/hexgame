@@ -5,7 +5,9 @@ var HexGamePiece = Y.Base.create("hexgamepiece", Y.Base, [/*Y.WidgetParent*/], {
   },
 
   destructor : function() {
-    this.get('shapes').remove();
+    Y.Array.each(this.get('shapes'), function(shape) {
+      shape.$node.remove();
+    }, this);
   },
 
   /**
@@ -14,9 +16,8 @@ var HexGamePiece = Y.Base.create("hexgamepiece", Y.Base, [/*Y.WidgetParent*/], {
    */
   render : function() {
     var piece = this.get('piece');
-    var shapes = [];
     var canvas = this.get('canvas');
-    var group = canvas.set();
+    var group = [];
     Y.Array.each(piece.get('cells'), function(cell) {
       var shape = Y.HexDrawUtils.drawHex({
         x : cell[0],
@@ -26,9 +27,9 @@ var HexGamePiece = Y.Base.create("hexgamepiece", Y.Base, [/*Y.WidgetParent*/], {
         offsetX : this.get('offsetX'),
         offsetY : this.get('offsetY')        
       });
+      shape.attr({fill: this.get('color')});
       group.push(shape);
     }, this);
-    group.attr({fill: this.get('color')});
     this._set('shapes', group);
     this._addEventListeners();
   },
@@ -87,7 +88,7 @@ var HexGamePiece = Y.Base.create("hexgamepiece", Y.Base, [/*Y.WidgetParent*/], {
       readOnly : true
     },
     color : {
-      value : '#ffffff'
+      value : 0xffffff
     }
   }
 });
